@@ -32,7 +32,7 @@ export default function Session({ sessionId }: { sessionId: string }){
   },[sessionId])
 
   useEffect(()=>{
-    const socket: Socket = io('/', { transports: ['websocket'] })
+    const socket: Socket = io(window.location.origin, { path: '/api/socket.io', transports: ['websocket'] })
     socket.on('connect', ()=>{
       socket.emit('join_session', sessionId)
     })

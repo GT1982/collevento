@@ -25,7 +25,7 @@ const sessions = new Map<string, any>();
 
 // HTTP + socket.io server
 const httpServer = http.createServer(app);
-const io = new IOServer(httpServer, { cors: { origin: '*' } });
+const io = new IOServer(httpServer, { path: '/api/socket.io', cors: { origin: '*' } });
 
 io.on('connection', (socket) => {
   console.log('socket connected', socket.id);
