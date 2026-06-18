@@ -1,6 +1,9 @@
 {
   "name": "collevento-monorepo",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "copy-resources": "node scripts/copy-resources.js",
     "generate-manifest": "node scripts/generate-manifest.js",
