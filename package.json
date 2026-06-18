@@ -8,8 +8,7 @@
   },
   "dependencies": {
     "@vercel/kv": "^1.0.0",
-    "uuid": "^14.0.0",
-    "redis": "^4.8.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@vercel/node": "^5.8.17"
