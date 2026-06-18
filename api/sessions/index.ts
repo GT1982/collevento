@@ -1,22 +1,16 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient, RedisClientType } from 'redis';
+import { Redis } from '@upstash/redis';
 
-const REDIS_DB_PREFIX = 'redis-sky-anchor:'; // namespace for the requested Redis DB
-let redisClient: RedisClientType | null = null;
+const REDIS_PREFIX = 'redis-sky-anchor:'; // namespace for this app's keys
 
-async function getRedis(): Promise<RedisClientType> {
-  if (redisClient && redisClient.isOpen) return redisClient;
-  const url = process.env.REDIS_URL;
-  redisClient = createClient({ url });
-  redisClient.on('error', (err) => console.error('Redis Client Error', err));
-  await redisClient.connect();
-  return redisClient;
-}
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN || undefined,
+});
 
 async function createSession(){
-  const client = await getRedis();
-  // use Redis INCR to get unique ids or fallback to randomUUID if not available
-  const id = String(Date.now()) + '-' + Math.floor(Math.random()*10000);
+  // simple unique id generation; could also use an INCR key in Redis if desired
+  const id = `${Date.now()}-${Math.floor(Math.random()*100000)}`;
   return { id };
 }
 
@@ -32,8 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     mixedDraws: [] as any[],
   };
   try {
-    const client = await getRedis();
-    await client.set(REDIS_DB_PREFIX + id, JSON.stringify(state));
+    await redis.set(`${REDIS_PREFIX}${id}`, JSON.stringify(state));
     return res.json(state);
   } catch (e) {
     console.error('Redis set error', e);
