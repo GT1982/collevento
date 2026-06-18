@@ -1,20 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { Redis } from '@upstash/redis';
+import getRedis from '../_redis';
 
 const REDIS_PREFIX = 'redis-sky-anchor:'; // namespace for this app's keys
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN || undefined,
-});
-
-// wrapper helpers to avoid TypeScript typing issues on build
-async function redisSet(key: string, value: string) {
-  return (redis as any).set(key, value);
-}
-async function redisGet(key: string) {
-  return (redis as any).get(key);
-}
 
 async function createSession(){
   // simple unique id generation; could also use an INCR key in Redis if desired
@@ -34,7 +21,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     mixedDraws: [] as any[],
   };
   try {
-    await redis.set(`${REDIS_PREFIX}${id}`, JSON.stringify(state));
+    const client = await getRedis();
+    await client.set(`${REDIS_PREFIX}${id}`, JSON.stringify(state));
     return res.json(state);
   } catch (e) {
     console.error('Redis set error', e);

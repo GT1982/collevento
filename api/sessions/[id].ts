@@ -1,11 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { Redis } from '@upstash/redis';
+import getRedis from '../_redis';
 
 const REDIS_PREFIX = 'redis-sky-anchor:';
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN,
-});
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const id = req.query.id as string;
@@ -13,16 +9,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const key = `${REDIS_PREFIX}${id}`;
 
-  async function getKey(k: string){
-    return (redis as any).get(k) as Promise<string | null>;
-  }
-  async function setKey(k: string, v: string){
-    return (redis as any).set(k, v);
-  }
 
   if (req.method === 'GET') {
     try {
-      const raw = await getKey(key);
+      const client = await getRedis();
+      const raw = await client.get(key) as string | null;
       if (!raw) return res.status(404).json({ error: 'Session not found' });
       return res.json(JSON.parse(raw));
     } catch (e) {
@@ -34,7 +25,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     const { action } = req.body || {};
     try {
-      const raw = await getKey(key);
+      const client = await getRedis();
+      const raw = await client.get(key) as string | null;
       if (!raw) return res.status(404).json({ error: 'Session not found' });
       const state = JSON.parse(raw);
 
@@ -86,7 +78,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Unknown action' });
       }
 
-      await setKey(key, JSON.stringify(state));
+      await client.set(key, JSON.stringify(state));
       return res.json(state);
     } catch (e) {
       console.error('Redis set error', e);
