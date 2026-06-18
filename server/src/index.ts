@@ -3,7 +3,7 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import http from 'http';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { Server as IOServer } from 'socket.io';
 
 const app = express();
@@ -46,7 +46,7 @@ app.get('/cards', (req, res) => {
 });
 
 app.post('/sessions', (req, res) => {
-  const id = uuidv4();
+  const id = randomUUID();
   const state = {
     id,
     selectedMajor: null,
