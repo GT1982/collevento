@@ -7,6 +7,7 @@
     "build": "npm run copy-resources && npm run generate-manifest && npm install --prefix client && npm run build --prefix client"
   },
   "dependencies": {
+    "@upstash/redis": "^1.38.0",
     "@vercel/kv": "^1.0.0",
     "uuid": "^14.0.0"
   },
