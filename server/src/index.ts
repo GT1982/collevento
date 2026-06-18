@@ -3,7 +3,10 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import http from 'http';
-import { randomUUID } from 'crypto';
+async function createSession(){
+  const { v4: uuidv4 } = await import('uuid');
+  return { id: uuidv4() };
+}
 import { Server as IOServer } from 'socket.io';
 
 const app = express();
@@ -45,8 +48,8 @@ app.get('/cards', (req, res) => {
   res.json({ files: listFiles(dir), deck });
 });
 
-app.post('/sessions', (req, res) => {
-  const id = randomUUID();
+app.post('/sessions', async (req, res) => {
+  const { id } = await createSession();
   const state = {
     id,
     selectedMajor: null,
