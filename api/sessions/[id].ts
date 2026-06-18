@@ -1,7 +1,17 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { kv } from '@vercel/kv';
+import { createClient, RedisClientType } from 'redis';
 
-const KV_PREFIX = 'session:';
+const REDIS_DB_PREFIX = 'redis-sky-anchor:';
+let redisClient: RedisClientType | null = null;
+
+async function getRedis(): Promise<RedisClientType> {
+  if (redisClient && redisClient.isOpen) return redisClient;
+  const url = process.env.REDIS_URL;
+  redisClient = createClient({ url });
+  redisClient.on('error', (err) => console.error('Redis Client Error', err));
+  await redisClient.connect();
+  return redisClient;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const id = req.query.id as string;
@@ -11,18 +21,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'GET') {
     try {
-      const raw = await kv.get(key) as string | null;
-      if (!raw) return res.status(404).json({ error: 'Session not found' });
-      return res.json(JSON.parse(raw));
-    } catch (e) {
-      return res.status(500).json({ error: 'KV error' });
-    }
+      try {
+        const client = await getRedis();
+        const raw = await client.get(key) as string | null;
+        if (!raw) return res.status(404).json({ error: 'Session not found' });
+        return res.json(JSON.parse(raw));
+      } catch (e) {
+        console.error('Redis get error', e);
+        return res.status(500).json({ error: 'Redis error' });
+      }
   }
 
   if (req.method === 'POST') {
     const { action } = req.body || {};
     try {
-      const raw = await kv.get(key) as string | null;
+      const client = await getRedis();
+      const raw = await client.get(key) as string | null;
       if (!raw) return res.status(404).json({ error: 'Session not found' });
       const state = JSON.parse(raw);
 
@@ -74,10 +88,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Unknown action' });
       }
 
-      await kv.set(key, JSON.stringify(state));
+      await client.set(key, JSON.stringify(state));
       return res.json(state);
     } catch (e) {
-      return res.status(500).json({ error: 'KV error or malformed state' });
+      console.error('Redis set error', e);
+      return res.status(500).json({ error: 'Redis error or malformed state' });
     }
   }
 
