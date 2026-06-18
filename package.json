@@ -1,0 +1,13 @@
+{
+  "name": "collevento-monorepo",
+  "private": true,
+  "scripts": {
+    "copy-resources": "node scripts/copy-resources.js",
+    "generate-manifest": "node scripts/generate-manifest.js",
+    "build": "npm run copy-resources && npm run generate-manifest && cd client && npm run build"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.0",
+    "uuid": "^9.0.0"
+  }
+}
