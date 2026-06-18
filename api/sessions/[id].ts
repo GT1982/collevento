@@ -13,9 +13,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const key = `${REDIS_PREFIX}${id}`;
 
+  async function getKey(k: string){
+    return (redis as any).get(k) as Promise<string | null>;
+  }
+  async function setKey(k: string, v: string){
+    return (redis as any).set(k, v);
+  }
+
   if (req.method === 'GET') {
     try {
-      const raw = await redis.get(key) as string | null;
+      const raw = await getKey(key);
       if (!raw) return res.status(404).json({ error: 'Session not found' });
       return res.json(JSON.parse(raw));
     } catch (e) {
@@ -27,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     const { action } = req.body || {};
     try {
-      const raw = await redis.get(key) as string | null;
+      const raw = await getKey(key);
       if (!raw) return res.status(404).json({ error: 'Session not found' });
       const state = JSON.parse(raw);
 
@@ -79,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Unknown action' });
       }
 
-      await redis.set(key, JSON.stringify(state));
+      await setKey(key, JSON.stringify(state));
       return res.json(state);
     } catch (e) {
       console.error('Redis set error', e);

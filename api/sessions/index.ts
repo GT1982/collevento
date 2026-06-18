@@ -8,6 +8,14 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN || undefined,
 });
 
+// wrapper helpers to avoid TypeScript typing issues on build
+async function redisSet(key: string, value: string) {
+  return (redis as any).set(key, value);
+}
+async function redisGet(key: string) {
+  return (redis as any).get(key);
+}
+
 async function createSession(){
   // simple unique id generation; could also use an INCR key in Redis if desired
   const id = `${Date.now()}-${Math.floor(Math.random()*100000)}`;
