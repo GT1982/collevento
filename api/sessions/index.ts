@@ -1,12 +1,15 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { v4 as uuidv4 } from 'uuid';
+async function createSession(){
+  const { v4: uuidv4 } = await import('uuid');
+  return { id: uuidv4() };
+}
 import { kv } from '@vercel/kv';
 
 const KV_PREFIX = 'session:';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const id = uuidv4();
+  const { id } = await createSession();
   const state = {
     id,
     selectedMajor: null,
