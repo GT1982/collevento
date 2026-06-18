@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-async function createSession(){
-  const { v4: uuidv4 } = await import('uuid');
-  return { id: uuidv4() };
+import { randomUUID } from 'crypto';
+function createSession(){
+  return { id: randomUUID() };
 }
 import { kv } from '@vercel/kv';
 
