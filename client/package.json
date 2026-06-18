@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node ./node_modules/vite/bin/vite.js build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -13,9 +13,9 @@
     "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "typescript": "^5.1.6",
     "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7"
+    "@types/react-dom": "^18.2.7",
+    "typescript": "^5.1.6",
+    "vite": "^8.0.16"
   }
 }
