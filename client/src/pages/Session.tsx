@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
+import { io, Socket } from 'socket.io-client'
 
 type MixedDraw = { deck: 'major'|'minor', filename: string };
 
@@ -29,6 +30,20 @@ export default function Session({ sessionId }: { sessionId: string }){
     load()
 
   },[sessionId])
+
+  useEffect(()=>{
+    const socket: Socket = io('/', { transports: ['websocket'] })
+    socket.on('connect', ()=>{
+      socket.emit('join_session', sessionId)
+    })
+    socket.on('session_update', (s: State)=>{
+      setState(s)
+    })
+    return ()=>{
+      socket.emit('leave_session', sessionId)
+      socket.disconnect()
+    }
+  }, [sessionId])
 
   async function selectCard(deck: 'major'|'minor', filename: string | null){
     await fetch(`/api/sessions/${sessionId}`, {
