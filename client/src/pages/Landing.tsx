@@ -6,9 +6,16 @@ export default function Landing(){
 
   async function createSession(){
     setCreating(true)
+    try{
       const res = await fetch('/api/sessions', { method: 'POST' })
-    const data = await res.json()
-    window.location.hash = `#/session/${data.id}`
+      if (!res.ok) { const j = await res.json().catch(()=>({error:'unknown'})); alert(j.error || 'Errore creazione sessione'); setCreating(false); return }
+      const data = await res.json()
+      window.location.hash = `#/session/${data.id}`
+    }catch(e){
+      console.error(e)
+      alert('Errore di rete: impossibile creare sessione')
+      setCreating(false)
+    }
   }
 
   function join(){

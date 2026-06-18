@@ -157,5 +157,13 @@ app.post('/sessions/:id/reset', (req, res) => {
   res.json(s);
 });
 
+// Provide compatibility for client which calls /api/* when running with Vite proxy
+// This will strip the /api prefix and forward to the existing handlers above (e.g. /sessions)
+app.use('/api', (req, res, next) => {
+  // remove /api prefix
+  req.url = req.url.replace(/^\/api/, '') || '/';
+  app._router.handle(req, res, next);
+});
+
 const port = process.env.PORT || 3000;
 httpServer.listen(port, () => console.log(`Server listening on ${port}`));
