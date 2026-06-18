@@ -157,6 +157,65 @@ app.post('/sessions/:id/reset', (req, res) => {
   res.json(s);
 });
 
+app.post('/sessions/:id', (req, res) => {
+  const id = req.params.id;
+  const s = sessions.get(id);
+  if (!s) return res.status(404).json({ error: 'Sessione non trovata' });
+
+  const { action } = req.body || {};
+  if (action === 'select') {
+    const { deck, filename } = req.body;
+    if (deck === 'major') s.selectedMajor = filename ?? null;
+    else s.selectedMinor = filename ?? null;
+  } else if (action === 'record-draw') {
+    const { deck, filename, mixed } = req.body;
+    if (mixed) {
+      s.mixedDraws = s.mixedDraws || [];
+      if (s.mixedDraws.length >= 10) return res.status(400).json({ error: 'Limite 10 raggiunto' });
+      const deckType = deck === 'major' ? 'major' : 'minor';
+      if (s.mixedDraws.some((d: any) => d.deck === deckType && d.filename === filename)) {
+        return res.status(400).json({ error: 'Carta già estratta' });
+      }
+      s.mixedDraws.push({ deck: deckType, filename });
+    } else if (deck === 'major') {
+      s.majorDraws = s.majorDraws || [];
+      if (s.majorDraws.length >= 10) return res.status(400).json({ error: 'Limite 10 raggiunto' });
+      if (s.majorDraws.includes(filename)) return res.status(400).json({ error: 'Carta già estratta' });
+      s.majorDraws.push(filename);
+    } else {
+      s.minorDraws = s.minorDraws || [];
+      if (s.minorDraws.length >= 10) return res.status(400).json({ error: 'Limite 10 raggiunto' });
+      if (s.minorDraws.includes(filename)) return res.status(400).json({ error: 'Carta già estratta' });
+      s.minorDraws.push(filename);
+    }
+  } else if (action === 'reset') {
+    s.majorDraws = [];
+    s.minorDraws = [];
+    s.selectedMajor = null;
+    s.selectedMinor = null;
+    s.mixedDraws = [];
+  } else if (action === 'reset-draws') {
+    const { deck } = req.body || {};
+    if (deck === 'major') {
+      s.majorDraws = [];
+    } else if (deck === 'minor') {
+      s.minorDraws = [];
+    } else if (deck === 'mixed') {
+      s.mixedDraws = [];
+    } else {
+      s.majorDraws = [];
+      s.minorDraws = [];
+      s.mixedDraws = [];
+    }
+  } else {
+    return res.status(400).json({ error: 'Azione sconosciuta' });
+  }
+
+  sessions.set(id, s);
+  emitSessionUpdate(id);
+  res.json(s);
+});
+
 // Provide compatibility for client which calls /api/* when running with Vite proxy
 // This will strip the /api prefix and forward to the existing handlers above (e.g. /sessions)
 app.use('/api', (req, res, next) => {

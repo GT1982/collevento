@@ -32,19 +32,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         else state.selectedMinor = filename ?? null;
       } else if (action === 'record-draw') {
         const { deck, filename, mixed } = req.body;
-        if (deck === 'major') {
+        if (mixed) {
+          state.mixedDraws = state.mixedDraws || [];
+          if ((state.mixedDraws.length||0) >= 10) return res.status(400).json({ error: 'Limit 10 reached' });
+          const deckType = deck === 'major' ? 'major' : 'minor';
+          if (state.mixedDraws.some((d: any) => d.deck === deckType && d.filename === filename)) {
+            return res.status(400).json({ error: 'Card already drawn' });
+          }
+          state.mixedDraws.push({ deck: deckType, filename });
+        } else if (deck === 'major') {
           state.majorDraws = state.majorDraws || [];
           if ((state.majorDraws.length||0) >= 10) return res.status(400).json({ error: 'Limit 10 reached' });
+          if (state.majorDraws.includes(filename)) return res.status(400).json({ error: 'Card already drawn' });
           state.majorDraws.push(filename);
         } else {
           state.minorDraws = state.minorDraws || [];
           if ((state.minorDraws.length||0) >= 10) return res.status(400).json({ error: 'Limit 10 reached' });
+          if (state.minorDraws.includes(filename)) return res.status(400).json({ error: 'Card already drawn' });
           state.minorDraws.push(filename);
-        }
-        if (mixed) {
-          state.mixedDraws = state.mixedDraws || [];
-          if ((state.mixedDraws.length||0) >= 10) return res.status(400).json({ error: 'Limit 10 reached' });
-          state.mixedDraws.push({ deck: deck === 'major' ? 'major' : 'minor', filename });
         }
       } else if (action === 'reset') {
         state.majorDraws = [];
@@ -53,9 +58,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         state.selectedMinor = null;
         state.mixedDraws = [];
       } else if (action === 'reset-draws') {
-        state.majorDraws = [];
-        state.minorDraws = [];
-        state.mixedDraws = [];
+        const { deck } = req.body || {};
+        if (deck === 'major') {
+          state.majorDraws = [];
+        } else if (deck === 'minor') {
+          state.minorDraws = [];
+        } else if (deck === 'mixed') {
+          state.mixedDraws = [];
+        } else {
+          state.majorDraws = [];
+          state.minorDraws = [];
+          state.mixedDraws = [];
+        }
       } else {
         return res.status(400).json({ error: 'Unknown action' });
       }

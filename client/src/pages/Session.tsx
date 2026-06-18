@@ -43,17 +43,28 @@ export default function Session({ sessionId }: { sessionId: string }){
       let chosen: {deck:'major'|'minor', filename:string} | null = null
       if (deck === 'arcani-maggiori') {
         if (!majors.length) return alert('Deck vuoto')
-        const f = majors[Math.floor(Math.random()*majors.length)];
+        const drawn = state?.majorDraws || []
+        const available = majors.filter(f => !drawn.includes(f))
+        if (!available.length) return alert('Nessun Arcano Maggiore rimasto disponibile per la stesura')
+        const f = available[Math.floor(Math.random()*available.length)];
         chosen = { deck: 'major', filename: f }
       } else if (deck === 'arcani-minori') {
         if (!minors.length) return alert('Deck vuoto')
-        const f = minors[Math.floor(Math.random()*minors.length)];
+        const drawn = state?.minorDraws || []
+        const available = minors.filter(f => !drawn.includes(f))
+        if (!available.length) return alert('Nessun Arcano Minore rimasto disponibile per la stesura')
+        const f = available[Math.floor(Math.random()*available.length)];
         chosen = { deck: 'minor', filename: f }
       } else if (deck === 'mixed') {
+        const drawn = state?.mixedDraws || []
+        const availableMajors = majors.filter(f => !drawn.some(m => m.deck === 'major' && m.filename === f))
+        const availableMinors = minors.filter(f => !drawn.some(m => m.deck === 'minor' && m.filename === f))
+        
         const pool: ({deck:'major'|'minor', filename:string})[] = []
-        majors.forEach(f=> pool.push({deck:'major', filename:f}))
-        minors.forEach(f=> pool.push({deck:'minor', filename:f}))
-        if (!pool.length) return alert('Deck vuoto')
+        availableMajors.forEach(f=> pool.push({deck:'major', filename:f}))
+        availableMinors.forEach(f=> pool.push({deck:'minor', filename:f}))
+        
+        if (!pool.length) return alert('Nessun Arcano rimasto disponibile per la stesura mista')
         chosen = pool[Math.floor(Math.random()*pool.length)]
       }
       if (!chosen) return;
@@ -70,11 +81,11 @@ export default function Session({ sessionId }: { sessionId: string }){
       if (!deck) {
         await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset' }) })
       } else if (deck === 'majors') {
-        await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset-draws' }) })
+        await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset-draws', deck: 'major' }) })
       } else if (deck === 'minors') {
-        await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset-draws' }) })
+        await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset-draws', deck: 'minor' }) })
       } else if (deck === 'mixed') {
-        await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset-draws' }) })
+        await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset-draws', deck: 'mixed' }) })
       }
       const r = await fetch(`/api/sessions/${sessionId}`)
       setState(await r.json())

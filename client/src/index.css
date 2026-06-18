@@ -1,6 +1,6 @@
 * { box-sizing: border-box; }
 body { font-family: 'Uncial Antiqua', 'Cinzel', Arial, Helvetica, sans-serif; margin: 0; padding: 0; background-color:#fbf8f2; color:#3b2416; }
-body.medieval { background-image: url('http://localhost:3000/images/WhatsApp Image 2026-06-12 at 23.04.22.jpeg'); background-size: cover; background-position: center; background-attachment: fixed; }
+body.medieval { background-image: url('/resource/WhatsApp Image 2026-06-12 at 23.04.22.jpeg'); background-size: cover; background-position: center; background-attachment: fixed; }
 body.medieval::before { content: ''; position: fixed; inset: 0; background: linear-gradient(rgba(12,6,3,0.20), rgba(12,6,3,0.20)); pointer-events: none; }
 .app { padding: 28px; width:1004px; max-width: calc(100% - 40px); margin:0 auto; background: rgba(255,250,243,0.92); box-shadow: 0 6px 12px rgba(0,0,0,0.18); border: 6px solid rgba(120,80,50,0.65); border-radius: 12px; }
 .header { display:flex; align-items:center; gap:12px; border-bottom: 3px double rgba(120,80,50,0.45); padding-bottom:8px; margin-bottom: 12px; }
