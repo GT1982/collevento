@@ -23,7 +23,7 @@ export default function Session({ sessionId }: { sessionId: string }){
       if (sres.ok) setState(await sres.json())
       try {
         // fetch manifest with lists of files (must be generated under client/public/resource/manifest.json)
-        const r = await fetch('/resource/manifest.json')
+        const r = await fetch(`/resource/manifest.json?v=${new Date().getTime()}`)
         const j = await r.json(); setMajors(j.majors || []); setMinors(j.minors || []);
       } catch(e){ console.error(e) }
     }
