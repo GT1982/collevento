@@ -5,6 +5,10 @@ const root = path.resolve(__dirname, '..');
 const resourceRoot = path.join(root, 'resource');
 const outRoot = path.join(root, 'client', 'public', 'resource');
 
+if (fs.existsSync(outRoot)) {
+  fs.rmSync(outRoot, { recursive: true, force: true });
+}
+
 function copyDir(src, dest){
   if (!fs.existsSync(src)) return;
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
