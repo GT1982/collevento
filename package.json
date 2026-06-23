@@ -2,9 +2,8 @@
   "name": "collevento-monorepo",
   "private": true,
   "scripts": {
-    "copy-resources": "node scripts/copy-resources.js",
     "generate-manifest": "node scripts/generate-manifest.js",
-    "build": "npm run copy-resources && npm run generate-manifest && npm install --prefix client && npm run build --prefix client"
+    "build": "npm run generate-manifest && npm install --prefix client && npm run build --prefix client"
   },
   "dependencies": {
     "redis": "^4.7.1",
