@@ -8,7 +8,13 @@
     "13 la Morte.png",
     "14 la Temperanza.png",
     "15 il Diavolo.png",
+    "16 la Torre.png",
+    "17 la stella.png",
+    "18 la Luna.png",
+    "19 il Sole.png",
     "2 la Papessa.png",
+    "20 il Giudizio.png",
+    "21 il Mondo.png",
     "3 l'Imperatrice.png",
     "4 l'Imperatore.png",
     "5 il Papa.png",
@@ -18,11 +24,19 @@
     "9 l'Eremita.png"
   ],
   "minors": [
-    "16 la Torre.png",
-    "17 la stella.png",
-    "18 la Luna.png",
-    "19 il Sole.png",
-    "20 il Giudizio.png",
-    "21 il Mondo.png"
+    "Asso di Coppe.png",
+    "Cavaliere di Coppe.png",
+    "Cinque di Coppe.png",
+    "Dieci di Coppe.png",
+    "Due di Coppe.png",
+    "Fante di Coppe.png",
+    "Nove di Coppe.png",
+    "Otto di coppe.png",
+    "Quattro di Coppe.png",
+    "Re di Coppe.png",
+    "Regina di Coppe.png",
+    "Sei di Coppe.png",
+    "Sette di coppe.png",
+    "Tre di Coppe.png"
   ]
 }
