@@ -1,5 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, Suspense, lazy } from 'react'
 import { io, Socket } from 'socket.io-client'
+import DeckCard from '../components/DeckCard'
+
+const DeckModal = lazy(() => import('../components/DeckModal'))
 
 type MixedDraw = { deck: 'major'|'minor', filename: string };
 
@@ -16,6 +19,7 @@ export default function Session({ sessionId }: { sessionId: string }){
   const [state, setState] = useState<State | null>(null)
   const [majors, setMajors] = useState<string[]>([])
   const [minors, setMinors] = useState<string[]>([])
+  const [activeDeck, setActiveDeck] = useState<'major' | 'minor' | null>(null)
 
   useEffect(()=>{
     async function load(){
@@ -158,19 +162,30 @@ export default function Session({ sessionId }: { sessionId: string }){
 
           </div>
 
-          <h4 id="select-majors">Arcani Maggiori (seleziona)</h4>
-          <div className="row">
-            {majors.map(f => (
-              <img key={f} className={state?.selectedMajor===f? 'thumb selected':'thumb'} src={`/resource/arcani-maggiori/${f}`} alt={f} onClick={()=>selectCard('major', f)} />
-            ))}
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '24px' }}>
+            <DeckCard 
+              title="Arcani Maggiori" 
+              subtitle={`${majors.length} carte`} 
+              onClick={() => setActiveDeck('major')} 
+            />
+            <DeckCard 
+              title="Arcani Minori" 
+              subtitle={`${minors.length} carte`} 
+              onClick={() => setActiveDeck('minor')} 
+            />
           </div>
 
-          <h4 id="select-minors" style={{marginTop:16}}>Arcani Minori (seleziona)</h4>
-          <div className="row">
-            {minors.map(f => (
-              <img key={f} className={state?.selectedMinor===f? 'thumb selected':'thumb'} src={`/resource/arcani-minori/${f}`} alt={f} onClick={()=>selectCard('minor', f)} />
-            ))}
-          </div>
+          <Suspense fallback={null}>
+            {activeDeck && (
+              <DeckModal
+                isOpen={!!activeDeck}
+                onClose={() => setActiveDeck(null)}
+                deckType={activeDeck}
+                cards={activeDeck === 'major' ? majors : minors}
+                onSelect={(filename) => selectCard(activeDeck, filename)}
+              />
+            )}
+          </Suspense>
         </div>
 
         <div className="column">
