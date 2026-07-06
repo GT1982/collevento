@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react'
-import { io, Socket } from 'socket.io-client'
+import { useSessionRealtime } from '../hooks/useSessionRealtime'
 import DeckCard from '../components/DeckCard'
 
 const DeckModal = lazy(() => import('../components/DeckModal'))
@@ -35,26 +35,12 @@ export default function Session({ sessionId }: { sessionId: string }){
 
   },[sessionId])
 
-  useEffect(()=>{
-    const socket: Socket = io(window.location.origin, { path: '/api/socket.io', transports: ['websocket'] })
-    socket.on('connect', ()=>{
-      socket.emit('join_session', sessionId)
-    })
-    socket.on('session_update', (s: State)=>{
-      setState(s)
-    })
-    return ()=>{
-      socket.emit('leave_session', sessionId)
-      socket.disconnect()
-    }
-  }, [sessionId])
+  useSessionRealtime(sessionId, setState)
 
   async function selectCard(deck: 'major'|'minor', filename: string | null){
     await fetch(`/api/sessions/${sessionId}`, {
       method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'select', deck: deck==='major' ? 'major' : 'minor', filename})
     })
-    const r = await fetch(`/api/sessions/${sessionId}`)
-    setState(await r.json())
   }
 
   async function draw(deck: 'arcani-maggiori'|'arcani-minori'|'mixed'){
@@ -90,8 +76,6 @@ export default function Session({ sessionId }: { sessionId: string }){
       // record draw
       const res = await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'record-draw', deck: chosen.deck==='major' ? 'major' : 'minor', filename: chosen.filename, mixed: deck==='mixed' }) })
       if (!res.ok){ const json = await res.json().catch(()=>({error:'Errore'})); return alert(json.error || 'Errore') }
-      const r = await fetch(`/api/sessions/${sessionId}`)
-      setState(await r.json())
     } catch(e){ console.error(e); alert('Errore during draw') }
   }
 
@@ -106,8 +90,6 @@ export default function Session({ sessionId }: { sessionId: string }){
       } else if (deck === 'mixed') {
         await fetch(`/api/sessions/${sessionId}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ action: 'reset-draws', deck: 'mixed' }) })
       }
-      const r = await fetch(`/api/sessions/${sessionId}`)
-      setState(await r.json())
     } catch(e){ console.error(e); alert('Errore during reset') }
   }
 

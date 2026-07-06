@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import getRedis from '../_redis';
+import { broadcastSessionUpdate } from '../_realtime';
 
 const REDIS_PREFIX = 'redis-sky-anchor:';
 
@@ -79,6 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       await client.set(key, JSON.stringify(state));
+      await broadcastSessionUpdate(id, state);
       return res.json(state);
     } catch (e) {
       console.error('Redis set error', e);
