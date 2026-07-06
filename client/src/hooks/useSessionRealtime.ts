@@ -1,30 +1,29 @@
 import { useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 export function useSessionRealtime(sessionId: string, setState: React.Dispatch<React.SetStateAction<any>>) {
   useEffect(() => {
-    if (!supabase) {
-      console.warn('Supabase non inizializzato: mancano VITE_SUPABASE_URL o VITE_SUPABASE_ANON_KEY');
-      return;
-    }
+    if (!sessionId) return;
 
-    const channel = supabase.channel(`session:${sessionId}`);
+    // Use EventSource to connect to our Server-Sent Events endpoint
+    const eventSource = new EventSource(`/api/sessions/${sessionId}/stream`);
 
-    channel
-      .on('broadcast', { event: 'session_update' }, (payload) => {
-        if (payload.payload && payload.payload.state) {
-          setState(payload.payload.state);
+    eventSource.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.type === 'session_update' && payload.state) {
+          setState(payload.state);
         }
-      })
-      .subscribe();
+      } catch (e) {
+        console.error('Errore nel parsing del messaggio SSE:', e);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('Errore di connessione SSE. EventSource tenterà di riconnettersi automaticamente.', error);
+    };
 
     return () => {
-      supabase.removeChannel(channel);
+      eventSource.close();
     };
   }, [sessionId, setState]);
 }

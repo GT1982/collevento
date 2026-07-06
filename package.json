@@ -6,7 +6,6 @@
     "build": "npm run generate-manifest && npm install --prefix client && npm run build --prefix client"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.110.0",
     "redis": "^4.7.1",
     "uuid": "^14.0.0"
   },
