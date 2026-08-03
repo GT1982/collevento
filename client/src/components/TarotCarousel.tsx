@@ -26,10 +26,13 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
 
   useEffect(() => {
     if (!emblaApi) return
-    console.log('Embla API ready', { options: emblaApi.options(), slides: emblaApi.slideNodes().length })
+    try {
+      const slideCount = typeof emblaApi.slideNodes === 'function' ? emblaApi.slideNodes().length : (emblaApi.slideNodes?.length ?? 0)
+      console.log('Embla API ready', { slides: slideCount })
+    } catch (e) { console.warn('Embla API inspect failed', e) }
     onInit(emblaApi)
-    emblaApi.on('reInit', onInit)
-    return () => emblaApi.off && emblaApi.off('reInit', onInit)
+    if (typeof emblaApi.on === 'function') emblaApi.on('reInit', onInit)
+    return () => { if (typeof emblaApi.off === 'function') emblaApi.off('reInit', onInit) }
   }, [emblaApi, onInit])
 
   return (
