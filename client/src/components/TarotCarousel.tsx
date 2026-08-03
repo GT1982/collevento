@@ -17,8 +17,8 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
   
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
 
-  const onInit = useCallback((emblaApi: any) => {
-    setScrollSnaps(emblaApi.scrollSnapList())
+  const onInit = useCallback((api: any) => {
+    setScrollSnaps(api.scrollSnapList())
   }, [])
 
   useEffect(() => {
@@ -28,13 +28,16 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
   }, [emblaApi, onInit])
 
   return (
-    <div className="embla" ref={emblaRef}>
-      <div className="embla__container">
-        {cards.map((card) => (
-          <div className="embla__slide" key={card}>
-            <TarotCardPreview filename={card} deckType={deckType} onSelect={onSelect} />
-          </div>
-        ))}
+    <div className="embla">
+      {/* embla viewport must receive the ref from useEmblaCarousel */}
+      <div className="embla__viewport" ref={emblaRef}>
+        <div className="embla__container">
+          {cards.map((card) => (
+            <div className="embla__slide" key={card}>
+              <TarotCardPreview filename={card} deckType={deckType} onSelect={onSelect} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
