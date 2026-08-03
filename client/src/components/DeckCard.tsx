@@ -21,6 +21,7 @@ export default function DeckCard({ title, subtitle, onClick }: DeckCardProps) {
       <div className="deck-card-content">
         <h3>{title}</h3>
         <p>{subtitle}</p>
+        <button className="deck-card-action" onClick={(e)=>{ e.stopPropagation(); onClick(); }} aria-label={`Open ${title} deck`}>Apri</button>
       </div>
     </motion.div>
   )

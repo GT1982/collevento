@@ -70,7 +70,34 @@ body.medieval::before { content: ''; position: fixed; inset: 0; background: line
   border-radius: 8px;
   backdrop-filter: blur(4px);
   border: 1px solid rgba(212, 175, 55, 0.3);
+  position: relative;
 }
+
+.deck-card h3 {
+  margin: 0 0 8px 0;
+  font-family: 'Cinzel', serif;
+  color: #f7dfb8;
+  letter-spacing: 1px;
+}
+
+.deck-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.deck-card-action {
+  margin-top: 12px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(212,175,55,0.3);
+  background: rgba(255,255,255,0.06);
+  color: #f7dfb8;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.deck-card-action:focus { outline: 3px solid rgba(119,184,107,0.25); }
 
 .deck-card h3 {
   margin: 0 0 8px 0;
