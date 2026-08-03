@@ -18,13 +18,18 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
 
   const onInit = useCallback((api: any) => {
+    try {
+      console.log('Embla init - slides:', api.slideNodes().length, 'containerWidth:', api.containerNode().clientWidth, 'slideCount:', api.slideNodes().length)
+    } catch (e) { console.warn('Embla init log failed', e) }
     setScrollSnaps(api.scrollSnapList())
   }, [])
 
   useEffect(() => {
     if (!emblaApi) return
+    console.log('Embla API ready', { options: emblaApi.options(), slides: emblaApi.slideNodes().length })
     onInit(emblaApi)
     emblaApi.on('reInit', onInit)
+    return () => emblaApi.off && emblaApi.off('reInit', onInit)
   }, [emblaApi, onInit])
 
   return (

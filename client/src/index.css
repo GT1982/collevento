@@ -106,3 +106,129 @@ body.medieval::before { content: ''; position: fixed; inset: 0; background: line
   letter-spacing: 1px;
 }
 
+/* Embla Carousel */
+.embla {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  overflow: visible;
+  padding: 40px 0 100px 0;
+  perspective: 1000px;
+}
+
+.embla__viewport {
+  width: 100%;
+  overflow: hidden; /* Embla requires viewport overflow hidden */
+}
+
+.embla__container {
+  display: flex;
+  gap: 20px;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -khtml-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transform-style: preserve-3d;
+}
+
+.embla__slide {
+  flex: 0 0 260px;
+  min-width: 0;
+  padding: 0 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .embla__slide {
+    flex: 0 0 340px;
+  }
+}
+
+/* Tarot Card Preview & Flip */
+.tarot-card-scene {
+  width: 200px;
+  height: 320px;
+  perspective: 1000px;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@media (min-width: 768px) {
+  .tarot-card-scene {
+    width: 260px;
+    height: 410px;
+  }
+}
+
+.tarot-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transform-style: preserve-3d;
+}
+
+.tarot-card-front, .tarot-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  border: 2px solid rgba(212, 175, 55, 0.4);
+}
+
+.tarot-card-back {
+  background: linear-gradient(145deg, #2a1f1a, #1a1412);
+  background-image: url('/resource/WhatsApp Image 2026-06-12 at 23.04.22.jpeg');
+  background-size: cover;
+  background-position: center;
+  border-color: rgba(212, 175, 55, 0.8);
+}
+
+.tarot-card-front {
+  transform: rotateY(180deg);
+  background: #fff;
+}
+
+.tarot-card-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.select-card-btn {
+  position: absolute;
+  bottom: -110px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(#fbe6c9,#f0c38a);
+  color: #3b2416;
+  border: 2px solid rgba(120,80,50,0.7);
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, bottom 0.3s;
+  z-index: 20;
+}
+
+.select-card-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  bottom: -90px;
+}
+
+.select-card-btn:hover {
+  background: linear-gradient(#f0c38a, #e5a863);
+}
