@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, Suspense, lazy } from 'react'
+import React, { useEffect, useState, Suspense, lazy } from 'react'
 import { useSessionRealtime } from '../hooks/useSessionRealtime'
 import DeckCard from '../components/DeckCard'
 

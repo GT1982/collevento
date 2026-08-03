@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, Dispatch, SetStateAction } from 'react';
 
-export function useSessionRealtime(sessionId: string, setState: React.Dispatch<React.SetStateAction<any>>) {
+export function useSessionRealtime<T>(sessionId: string, setState: Dispatch<SetStateAction<T>>) {
   useEffect(() => {
     if (!sessionId) return;
 
