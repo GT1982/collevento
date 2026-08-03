@@ -5,10 +5,10 @@ declare global {
   var __collevento_redis: RedisClientType | undefined;
 }
 
-// Accept both lowercase and uppercase env var names
-const url = process.env.collevento_REDIS_URL || process.env.COLLEVENTO_REDIS_URL;
+// Accept both REDIS_URL and legacy collevent env names
+const url = process.env.REDIS_URL || process.env.COLLEVENT_REDIS_URL || process.env.collevento_REDIS_URL || process.env.collevent_REDIS_URL;
 
-if (!url) console.warn('Warning: collevento_REDIS_URL is not set — using in-memory fallback');
+if (!url) console.warn('Warning: REDIS_URL is not set — using in-memory fallback');
 
 let client: RedisClientType | undefined;
 
