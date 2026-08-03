@@ -5,11 +5,12 @@ interface TarotCardPreviewProps {
   filename: string
   deckType: 'major' | 'minor'
   onSelect: (filename: string) => void
+  forceLoad?: boolean
 }
 
-export default function TarotCardPreview({ filename, deckType, onSelect }: TarotCardPreviewProps) {
+export default function TarotCardPreview({ filename, deckType, onSelect, forceLoad = false }: TarotCardPreviewProps) {
   const [isFlipped, setIsFlipped] = useState(true)
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(forceLoad)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

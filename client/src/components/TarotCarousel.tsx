@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
-import TarotCardPreview from './TarotCardPreview'
+import React, { Suspense } from 'react'
+const TarotCardPreview = React.lazy(() => import('./TarotCardPreview'))
 
 interface TarotCarouselProps {
   cards: string[]
