@@ -118,7 +118,7 @@ body.medieval::before { content: ''; position: fixed; inset: 0; background: line
 
 .embla__viewport {
   width: 100%;
-  overflow: hidden; /* Embla requires viewport overflow hidden */
+  overflow: visible; /* Embla requires viewport overflow hidden */
   outline: none;
 }
 
@@ -249,4 +249,229 @@ body.medieval::before { content: ''; position: fixed; inset: 0; background: line
 
 .select-card-btn:hover {
   background: linear-gradient(#f0c38a, #e5a863);
+}
+
+
+/* ===========================================================
+   PATCH — incolla in fondo a index.css
+   Usa i token già esistenti nel progetto (oro rgba(212,175,55,x),
+   scuro #1a1a1a/#2a2a2a, inchiostro #3b2416, font Cinzel).
+   Non sovrascrive nulla: aggiunge solo le regole mancanti
+   e ne sovrascrive due, volutamente, spiegate sotto.
+   =========================================================== */
+
+/* -----------------------------------------------------------
+   1) FIX NECESSARIO — modifica questa riga ESISTENTE in index.css
+   (non aggiungerla qui sotto, editala dove già si trova):
+
+   .embla__viewport { overflow: hidden; ... }
+                       ^^^^^^^^^^^^^^^^ cambia in: overflow: visible;
+
+   Perché: con overflow:hidden, qualunque figlio del viewport che
+   sporge dal suo box viene tagliato — incluso il bottone select
+   (che a sua volta ha un secondo problema, vedi punto 3).
+   Con overflow:visible ottieni anche il vero effetto "cover-flow":
+   le carte laterali possono sporgere e ruotare fuori dallo slot.
+   ----------------------------------------------------------- */
+
+/* -----------------------------------------------------------
+   2) MODAL — mancante del tutto nel CSS attuale
+   ----------------------------------------------------------- */
+.deck-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(12, 6, 3, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.deck-modal-shell {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+    border: 4px solid rgba(212, 175, 55, 0.6);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.1);
+    padding: 24px 20px 40px;
+    padding-top: 86px; /* extra top space to avoid title overlap */
+}
+
+.deck-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 64px; /* create larger gap below header to prevent card overlap */
+}
+
+.deck-modal-title {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+    color: #f7dfb8;
+    margin: 0;
+}
+
+.deck-modal-close {
+    position: absolute;
+    right: 0;
+    top: -4px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background: rgba(255, 255, 255, 0.06);
+    color: #f7dfb8;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 200ms ease, background 200ms ease;
+}
+.deck-modal-close:hover,
+.deck-modal-close:focus-visible {
+    transform: rotate(90deg);
+    background: rgba(212, 175, 55, 0.18);
+    outline: none;
+}
+
+.deck-modal-loading {
+    text-align: center;
+    padding: 60px 0;
+    color: #f7dfb8;
+    font-family: 'Cinzel', serif;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* -----------------------------------------------------------
+   3) BOTTONE "Seleziona" — ora vive DENTRO .tarot-card-front
+   (che ha già position:absolute nel tuo CSS, quindi diventa
+   il containing block corretto: una carta, un bottone, nella
+   posizione giusta). Sovrascriviamo solo il posizionamento
+   della TUA .select-card-btn quando è dentro questo wrapper;
+   il tuo stesso stile (gradiente, bordo, font) resta invariato.
+   ----------------------------------------------------------- */
+.tarot-card-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 8px 12px;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.75) 60%);
+    border-radius: 0 0 8px 8px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 250ms ease, transform 250ms ease;
+    pointer-events: none;
+}
+
+.tarot-card-scene.is-active .tarot-card-overlay,
+.tarot-card-scene:hover .tarot-card-overlay,
+.tarot-card-scene:focus-within .tarot-card-overlay {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.tarot-card-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    color: #f7dfb8;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Reset del posizionamento assoluto originale: dentro l'overlay
+   il bottone torna in flusso normale, sempre nella card giusta */
+.tarot-card-overlay .select-card-btn {
+    position: static;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    bottom: auto;
+    left: auto;
+    margin: 0;
+}
+
+/* -----------------------------------------------------------
+   4) Glow sulla carta centrale/attiva
+   ----------------------------------------------------------- */
+.tarot-card-scene.is-active .tarot-card-front,
+.tarot-card-scene.is-active .tarot-card-back {
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.9), 0 0 30px rgba(212, 175, 55, 0.55),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+    animation: tarot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes tarot-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(212,175,55,0.9), 0 0 18px rgba(212,175,55,0.4), 0 8px 16px rgba(0,0,0,0.4); }
+    50%      { box-shadow: 0 0 0 2px rgba(212,175,55,0.9), 0 0 34px rgba(212,175,55,0.7), 0 8px 16px rgba(0,0,0,0.4); }
+}
+
+/* -----------------------------------------------------------
+   5) Frecce laterali del carosello (nuove, opzionali)
+   ----------------------------------------------------------- */
+.embla-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    color: #f7dfb8;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: background 200ms ease, transform 200ms ease;
+}
+.embla-arrow:hover { background: rgba(212, 175, 55, 0.18); }
+.embla-arrow--prev { left: 8px; }
+.embla-arrow--next { right: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .tarot-card-overlay, .select-card-btn, .deck-modal-close, .tarot-card-scene.is-active .tarot-card-front {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* ===========================================================
+   PATCH v2 — incolla DOPO tarot-patch.css (deve stare più in
+   basso nel file per vincere sulla cascata)
+   =========================================================== */
+
+.deck-modal-shell {
+    /* più respiro sopra, e via lo scroll: le carte che "sporgono"
+       per l'effetto cover-flow devono starci dentro, non generare
+       una scrollbar */
+    max-width: 1280px;
+    max-height: 92vh;
+    padding-top: 56px;
+    overflow: hidden;
+}
+
+.deck-modal-header {
+    margin-bottom: 28px;
+}
+
+.embla {
+    margin-top: 8px;
 }

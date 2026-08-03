@@ -14,50 +14,50 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
     containScroll: false,
     dragFree: true
   })
-  
-  const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const onInit = useCallback((api: any) => {
     try {
-      console.log('Embla init - slides:', api.slideNodes().length, 'containerWidth:', api.containerNode().clientWidth, 'slideCount:', api.slideNodes().length)
-    } catch (e) { console.warn('Embla init log failed', e) }
-    setScrollSnaps(api.scrollSnapList())
-    try { if (typeof api.selectedScrollSnap === 'function') setSelectedIndex(api.selectedScrollSnap()) } catch(e) {}
+      if (typeof api.selectedScrollSnap === 'function') setSelectedIndex(api.selectedScrollSnap())
+    } catch (e) {}
   }, [])
 
   useEffect(() => {
     if (!emblaApi) return
-    try {
-      const slideCount = typeof emblaApi.slideNodes === 'function' ? emblaApi.slideNodes().length : (emblaApi.slideNodes?.length ?? 0)
-      console.log('Embla API ready', { slides: slideCount })
-    } catch (e) { console.warn('Embla API inspect failed', e) }
     onInit(emblaApi)
     const update = () => {
       try {
         const idx = typeof emblaApi.selectedScrollSnap === 'function' ? emblaApi.selectedScrollSnap() : 0
         setSelectedIndex(idx)
-      } catch(e){ }
+      } catch (e) {}
     }
     if (typeof emblaApi.on === 'function') {
       emblaApi.on('reInit', onInit)
       emblaApi.on('select', update)
       emblaApi.on('scroll', update)
     }
+    // keyboard arrow navigation
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') emblaApi.scrollPrev()
+      if (e.key === 'ArrowRight') emblaApi.scrollNext()
+    }
+    window.addEventListener('keydown', handleKey)
     return () => {
       if (typeof emblaApi.off === 'function') {
         emblaApi.off('reInit', onInit)
         emblaApi.off('select', update)
         emblaApi.off('scroll', update)
       }
+      window.removeEventListener('keydown', handleKey)
     }
   }, [emblaApi, onInit])
 
-  function computeStyle(i:number){
+  function computeStyle(i: number) {
     const diff = i - selectedIndex
     const clamp = Math.max(-6, Math.min(6, diff))
     const abs = Math.abs(clamp)
-    const angle = clamp * 8 // degrees per step
+    const angle = clamp * 8
     const tx = clamp * 80
     const ty = -Math.abs(clamp) * 18
     const rotateY = clamp * -8
@@ -76,14 +76,28 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
 
   return (
     <div className="embla">
-      <div className="embla__viewport" ref={emblaRef} tabIndex={0} aria-label="Tarot carousel viewport">
+      <button
+        className="embla-arrow embla-arrow--prev"
+        aria-label="Carta precedente"
+        onClick={() => emblaApi?.scrollPrev()}
+      >
+        &#8249;
+      </button>
+
+      <div className="embla__viewport" ref={emblaRef} tabIndex={0} aria-label="Carosello dei tarocchi">
         <div className="embla__container">
           {cards.map((card, idx) => (
             <div className="embla__slide" key={card}>
               <div className="fan-slide" style={computeStyle(idx)}>
                 {Math.abs(idx - selectedIndex) <= 3 ? (
                   <Suspense fallback={null}>
-                    <TarotCardPreview filename={card} deckType={deckType} onSelect={onSelect} forceLoad />
+                    <TarotCardPreview
+                      filename={card}
+                      deckType={deckType}
+                      onSelect={onSelect}
+                      isActive={idx === selectedIndex}
+                      forceLoad
+                    />
                   </Suspense>
                 ) : (
                   <div className="tarot-placeholder" aria-hidden="true" />
@@ -93,7 +107,14 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
           ))}
         </div>
       </div>
+
+      <button
+        className="embla-arrow embla-arrow--next"
+        aria-label="Carta successiva"
+        onClick={() => emblaApi?.scrollNext()}
+      >
+        &#8250;
+      </button>
     </div>
   )
 }
-

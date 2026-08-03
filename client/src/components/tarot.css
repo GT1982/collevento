@@ -1,0 +1,304 @@
+/* ===========================================================
+   Tarot Deck Visualizer — palette
+   Adatta questi valori a quelli già esistenti nel tuo tema
+   (se hai già variabili globali per oro/pergamena, riusa quelle).
+   =========================================================== */
+:root {
+  --tarot-gold: #c9a227;
+  --tarot-gold-bright: #e8c766;
+  --tarot-ink: #0e0d14;
+  --tarot-ink-soft: #1a1826;
+  --tarot-parchment: #e7dcc2;
+  --tarot-shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* ===========================================================
+   MODAL — reso tramite Portal in #tarot-modal-root (document.body)
+   =========================================================== */
+.deck-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.deck-modal-shell {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse at top, rgba(201, 162, 39, 0.08), transparent 60%),
+    linear-gradient(180deg, var(--tarot-ink-soft), var(--tarot-ink));
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  border-radius: 18px;
+  box-shadow:
+    0 30px 80px var(--tarot-shadow),
+    0 0 0 1px rgba(201, 162, 39, 0.08) inset,
+    0 0 60px rgba(201, 162, 39, 0.06) inset;
+  overflow: hidden;
+  padding: 28px 24px 36px;
+}
+
+.deck-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.deck-modal-title {
+  font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  color: var(--tarot-gold-bright);
+  text-shadow: 0 0 18px rgba(201, 162, 39, 0.35);
+  margin: 0;
+}
+
+.deck-modal-close {
+  position: absolute;
+  right: 0;
+  top: -6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--tarot-gold-bright);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+
+.deck-modal-close:hover,
+.deck-modal-close:focus-visible {
+  transform: rotate(90deg);
+  box-shadow: 0 0 16px rgba(201, 162, 39, 0.5);
+  background: rgba(201, 162, 39, 0.15);
+  outline: none;
+}
+
+.deck-modal-loading {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--tarot-gold);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ===========================================================
+   CAROSELLO — cover-flow "à la" Apple / Hearthstone
+   =========================================================== */
+.embla {
+  position: relative;
+  padding: 40px 60px 16px;
+}
+
+.embla__viewport {
+  /* overflow VISIBLE: le carte laterali devono poter sporgere
+     e ruotare fuori dal proprio slot per l'effetto cover-flow */
+  overflow: visible;
+  outline: none;
+}
+
+.embla__container {
+  display: flex;
+  align-items: center;
+  min-height: 420px;
+}
+
+.embla__slide {
+  position: relative;
+  flex: 0 0 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.embla-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--tarot-gold-bright);
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: box-shadow 200ms ease, transform 200ms ease, background 200ms ease;
+}
+.embla-arrow:hover { box-shadow: 0 0 18px rgba(201, 162, 39, 0.5); background: rgba(201, 162, 39, 0.15); }
+.embla-arrow--prev { left: 0; }
+.embla-arrow--next { right: 0; }
+
+/* ===========================================================
+   CARTA — scena 3D + fronte/retro
+   =========================================================== */
+.tarot-card-scene {
+  width: 200px;
+  height: 340px;
+  perspective: 1400px;
+}
+
+.tarot-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  transition: filter 300ms ease;
+}
+
+.tarot-card-back,
+.tarot-card-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 14px;
+  border: 2px solid var(--tarot-gold);
+  box-shadow: 0 12px 30px var(--tarot-shadow);
+  overflow: hidden;
+}
+
+.tarot-card-back {
+  background:
+    repeating-linear-gradient(45deg, #1c1930, #1c1930 10px, #171429 10px, #171429 20px);
+  background-color: var(--tarot-ink-soft);
+}
+
+.tarot-card-front {
+  transform: rotateY(180deg);
+  background: var(--tarot-ink);
+}
+
+.tarot-card-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* hover — solo sulla carta attiva/centrale, per non creare rumore visivo */
+.tarot-card-scene.is-active .tarot-card-inner:hover {
+  filter: brightness(1.08);
+}
+
+.tarot-card-scene.is-active .tarot-card-front,
+.tarot-card-scene.is-active .tarot-card-back {
+  box-shadow:
+    0 0 0 2px var(--tarot-gold-bright),
+    0 0 30px rgba(201, 162, 39, 0.55),
+    0 18px 40px var(--tarot-shadow);
+  animation: tarot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes tarot-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--tarot-gold-bright), 0 0 20px rgba(201, 162, 39, 0.4), 0 18px 40px var(--tarot-shadow); }
+  50%      { box-shadow: 0 0 0 2px var(--tarot-gold-bright), 0 0 38px rgba(201, 162, 39, 0.7), 0 18px 40px var(--tarot-shadow); }
+}
+
+/* overlay nome + bottone, DENTRO la carta: non viene mai tagliato
+   da un overflow:hidden di un contenitore genitore */
+.tarot-card-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px 12px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.88) 55%);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 250ms ease, transform 250ms ease;
+  pointer-events: none;
+}
+
+/* mostra sempre l'overlay sulla carta centrale; sulle altre al hover/focus */
+.tarot-card-scene.is-active .tarot-card-overlay,
+.tarot-card-scene:hover .tarot-card-overlay,
+.tarot-card-scene:focus-within .tarot-card-overlay {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tarot-card-name {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--tarot-gold-bright);
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.select-card-btn {
+  font-family: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--tarot-gold);
+  background: rgba(201, 162, 39, 0.14);
+  color: var(--tarot-gold-bright);
+  cursor: pointer;
+  transition: background 200ms ease, box-shadow 200ms ease, transform 150ms ease;
+}
+
+.select-card-btn:hover,
+.select-card-btn:focus-visible {
+  background: var(--tarot-gold);
+  color: var(--tarot-ink);
+  box-shadow: 0 0 16px rgba(201, 162, 39, 0.6);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.tarot-placeholder {
+  width: 200px;
+  height: 340px;
+  border-radius: 14px;
+  border: 1px dashed rgba(201, 162, 39, 0.2);
+}
+
+/* ===========================================================
+   Responsive
+   =========================================================== */
+@media (max-width: 900px) {
+  .embla__slide { flex-basis: 170px; }
+  .tarot-card-scene { width: 150px; height: 255px; }
+  .tarot-placeholder { width: 150px; height: 255px; }
+  .deck-modal-shell { padding: 20px 12px 28px; }
+}
+
+@media (max-width: 560px) {
+  .embla { padding: 24px 44px 8px; }
+  .embla-arrow { width: 38px; height: 38px; font-size: 1.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarot-card-inner,
+  .tarot-card-overlay,
+  .select-card-btn,
+  .deck-modal-close {
+    transition: none !important;
+    animation: none !important;
+  }
+}

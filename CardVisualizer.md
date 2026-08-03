@@ -1,236 +1,514 @@
-This project uses Vite + React and already contains working tarot reading logic, session management, card datasets, and backend integrations.
+# FEATURE: Refactor della selezione Arcani Maggiori e Arcani Minori
 
-The goal is to completely redesign the tarot card selection UI to improve performance, reduce initial loading time, and create a much more immersive tarot experience.
+## Contesto
 
-IMPORTANT:
-- Preserve all existing tarot reading logic.
-- Preserve all existing session logic.
-- Preserve all existing APIs and backend integrations.
-- Preserve existing card data structures whenever possible.
-- Focus only on refactoring the card selection experience and its performance.
+L'applicazione è sviluppata con:
 
-====================================================
-NEW USER EXPERIENCE
-====================================================
+- React
+- Vite
+- TypeScript
 
-Replace the current card selection grids with a deck-based experience.
+Il sito è un'app fantasy dedicata alla lettura dei Tarocchi.
 
-Instead of displaying all cards immediately:
+L'attuale esperienza utente presenta un problema:
 
-Display only two face-down deck cards:
+Quando l'utente clicca su:
 
-1. Major Arcana
-2. Minor Arcana
+- Arcani Maggiori
+- Arcani Minori
 
-Each deck card should:
-- Show a custom tarot card back design.
-- Display the deck name.
-- Display the number of cards in the deck.
-- Have subtle hover animations.
-- Have tap/click animations.
-- Feel premium and mystical.
+viene semplicemente renderizzata una lunga lista di carte sotto la pagina.
 
-====================================================
-DECK OPENING EXPERIENCE
-====================================================
+Questa soluzione è poco moderna, poco immersiva e rende difficile la selezione.
 
-When the user clicks a deck:
+L'obiettivo è sostituire completamente questo comportamento con un'esperienza premium.
 
-- Open a fullscreen modal.
-- Blur the background.
-- Animate the modal entrance using fade + scale.
-- Create the feeling that the deck is being opened on a tarot table.
+---
 
-Use Framer Motion for all animations.
+# OBIETTIVO
 
-====================================================
-CARD BROWSING EXPERIENCE
-====================================================
+La selezione delle carte deve diventare uno degli elementi principali dell'esperienza del sito.
 
-Inside the modal:
+L'interazione deve ricordare videogiochi come:
 
-Replace the existing grid with an immersive tarot browsing interface.
+- Hearthstone
+- Magic The Gathering Arena
+- Diablo IV UI
+- Baldur's Gate 3
+- Apple Cover Flow
 
-Preferred layout:
+L'utente deve avere la sensazione di scegliere una carta da un vero mazzo magico.
 
-A fan-shaped or curved card arrangement similar to how tarot readers spread cards on a table.
+---
 
-Requirements:
+# NON MODIFICARE
 
-- Show approximately 7–9 cards simultaneously.
-- Center card is larger and highlighted.
-- Side cards are slightly smaller.
-- Side cards partially overlap.
-- Apply perspective/depth effects.
-- Smooth transitions while browsing.
+Mantenere:
 
-Navigation:
+- palette colori
+- immagini
+- font
+- tema fantasy
+- logica applicativa esistente
+- struttura dei dati delle carte
 
-- Swipe on mobile.
-- Mouse drag on desktop.
-- Keyboard arrow navigation.
-- Touch friendly.
+Modificare esclusivamente la UX della selezione.
 
-Embla Carousel is preferred as the underlying carousel engine.
+---
 
-====================================================
-CARD SELECTION EXPERIENCE
-====================================================
+# NUOVA ARCHITETTURA
 
-When a user clicks a card:
+Creare componenti dedicati.
 
-1. Bring the card to the center.
-2. Perform a smooth card flip animation.
-3. Reveal the card face.
-4. Slightly enlarge the selected card.
-5. Show a confirmation button:
+```
+components/
+    tarot/
+        TarotSelectionModal.tsx
+        TarotCarousel.tsx
+        TarotCard.tsx
+        TarotSearch.tsx
+        TarotHeader.tsx
+        TarotFooter.tsx
+        NavigationArrows.tsx
+```
 
-"Select this card"
+Separare chiaramente:
 
-Only after confirmation should the existing application logic continue.
+UI
 
-====================================================
-PERFORMANCE OPTIMIZATION
-====================================================
+logica
 
-Current problem:
+stato
 
-All tarot cards are rendered immediately.
+animazioni
 
-This must be removed.
+---
 
-Requirements:
+# LIBRERIE
 
-- Never render the entire deck at once.
-- Only render visible cards plus a small buffer.
-- Target rendering window:
-  - visible cards
-  - 2–3 cards before
-  - 2–3 cards after
+Utilizzare:
 
-Use virtualization techniques where appropriate.
+Embla Carousel
 
-====================================================
-IMAGE LOADING OPTIMIZATION
-====================================================
+per il carosello.
 
-Do NOT preload all tarot card images.
+Utilizzare:
 
-The initial deck data should only contain metadata:
+Framer Motion
 
-{
-  id,
-  name,
-  deck,
-  imagePath
+per tutte le animazioni.
+
+Utilizzare:
+
+React Portal
+
+per il Modal.
+
+---
+
+# MODAL
+
+Quando l'utente clicca
+
+Arcani Maggiori
+
+oppure
+
+Arcani Minori
+
+aprire un Modal fullscreen.
+
+Il Modal deve essere renderizzato tramite Portal.
+
+Lo sfondo deve avere:
+
+background:
+
+rgba(0,0,0,.82)
+
+backdrop-filter:
+
+blur(10px)
+
+Il body deve avere:
+
+overflow:hidden
+
+finché il popup è aperto.
+
+---
+
+# LAYOUT
+
+Centro dello schermo.
+
+Massima larghezza:
+
+1200px
+
+Massima altezza:
+
+90vh
+
+Responsive.
+
+---
+
+# HEADER
+
+Mostrare:
+
+Titolo
+
+(es. Arcani Maggiori)
+
+Campo ricerca
+
+Pulsante chiusura
+
+---
+
+# RICERCA
+
+Campo ricerca in tempo reale.
+
+Placeholder:
+
+"Cerca una carta..."
+
+Filtrare il carosello senza ricaricare.
+
+---
+
+# CAROSELLO
+
+Usare Embla Carousel.
+
+Desktop
+
+5-7 carte visibili
+
+Tablet
+
+3 carte
+
+Mobile
+
+1 carta
+
+La carta centrale deve essere:
+
+più grande
+
+perfettamente leggibile
+
+illuminata
+
+Le laterali devono essere:
+
+più piccole
+
+leggermente sfocate
+
+ruotate
+
+trasparenti
+
+Stile:
+
+Cover Flow.
+
+---
+
+# NAVIGAZIONE
+
+Supportare:
+
+mouse drag
+
+touch swipe
+
+wheel
+
+arrow keys
+
+frecce laterali
+
+---
+
+# CARTA
+
+Ogni carta deve avere:
+
+bordo dorato
+
+ombra fantasy
+
+texture elegante
+
+hover glow
+
+border-radius coerente con il sito
+
+---
+
+# HOVER
+
+Hover animation:
+
+scale(1.08)
+
+translateY(-8px)
+
+rotateY(5deg)
+
+box-shadow dorato
+
+transition
+
+300ms ease
+
+---
+
+# CARTA ATTIVA
+
+La carta selezionata deve avere:
+
+Glow dorato
+
+Scala
+
+1.12
+
+Outline luminoso
+
+Leggera animazione di pulsazione
+
+---
+
+# CLICK
+
+Quando viene cliccata una carta:
+
+eseguire
+
+piccolo flip 3D
+
+glow
+
+conferma
+
+Successivamente:
+
+chiudere automaticamente il modal
+
+salvare la carta selezionata
+
+aggiornare la UI principale
+
+---
+
+# PREVIEW
+
+Sotto il carosello mostrare:
+
+Nome carta
+
+Numero
+
+Breve descrizione
+
+Pulsante
+
+"Seleziona"
+
+---
+
+# ANIMAZIONI
+
+Utilizzare Framer Motion.
+
+Animazione apertura:
+
+opacity
+
+0 -> 1
+
+scale
+
+0.9 -> 1
+
+blur
+
+10px -> 0
+
+Animazione chiusura:
+
+reverse.
+
+Animazione carte:
+
+spring
+
+stiffness media
+
+movement naturale.
+
+---
+
+# ACCESSIBILITÀ
+
+Supportare:
+
+ESC
+
+TAB
+
+ENTER
+
+SPACE
+
+Focus trap
+
+ARIA labels
+
+---
+
+# PERFORMANCE
+
+Utilizzare:
+
+React.memo
+
+useMemo
+
+useCallback
+
+per evitare render inutili.
+
+Lazy loading immagini.
+
+Renderizzare solo le carte visibili quando possibile.
+
+---
+
+# TYPESCRIPT
+
+Definire interfacce dedicate.
+
+Esempio:
+
+```ts
+interface TarotCard {
+    id: string;
+    name: string;
+    number: number;
+    image: string;
+    description?: string;
+    arcana: "major" | "minor";
 }
+```
 
-Requirements:
+Evitare:
 
-- Images must be loaded only when needed.
-- Use lazy loading.
-- Use IntersectionObserver or equivalent.
-- Preload only nearby cards:
-  - 2–3 ahead
-  - 2–3 behind
-- Minimize initial network requests.
-- Minimize bundle size.
+any
 
-If card images are currently imported statically, refactor them to load on demand.
+cast inutili
 
-====================================================
-CODE SPLITTING
-====================================================
+duplicazione.
 
-The deck browsing system should not be included in the initial page bundle.
+---
 
-Use dynamic imports:
+# STATO
 
-- DeckModal
-- TarotCarousel
-- TarotCardPreview
-- Any heavy browsing components
+Gestire lo stato tramite React Hooks.
 
-Load them only when a user opens a deck.
+Separare:
 
-Use React.lazy and Suspense.
+selectedCard
 
-====================================================
-REACT OPTIMIZATION
-====================================================
+filteredCards
 
-Apply React performance best practices:
+searchQuery
 
-- React.memo where beneficial.
-- useMemo where appropriate.
-- useCallback where appropriate.
-- Prevent unnecessary re-renders.
-- Avoid expensive calculations during render.
+modalOpen
 
-====================================================
-ANIMATIONS
-====================================================
+activeDeck
 
-Use Framer Motion.
+---
 
-Required animations:
+# CODICE
 
-Deck cards:
-- hover
-- tap
-- subtle floating effect
+Seguire queste regole:
 
-Modal:
-- fade in
-- scale in
+- componenti piccoli
+- funzioni pure
+- codice leggibile
+- nessuna duplicazione
+- commenti solo dove realmente utili
 
-Cards:
-- slide transitions
-- depth effect
-- flip reveal animation
+---
 
-Selection:
-- smooth focus animation
-- confirmation state animation
+# UX
 
-Animations should feel elegant, mystical, and premium.
+L'utente deve percepire:
 
-====================================================
-RESPONSIVE DESIGN
-====================================================
+eleganza
 
-Must work flawlessly on:
+fluidità
 
-- mobile phones
-- tablets
-- desktop screens
+magia
 
-Mobile experience is a priority.
+mistero
 
-The fan layout should adapt responsively while maintaining usability.
+premium experience
 
-====================================================
-ACCESSIBILITY
-====================================================
+La scelta della carta deve essere coinvolgente e piacevole.
 
-Implement:
+---
 
-- keyboard navigation
-- focus trapping inside modal
-- ARIA labels
-- accessible buttons
-- screen-reader-friendly interactions
+# RIMUOVERE
 
-====================================================
-EXPECTED RESULT
-====================================================
+Eliminare completamente il comportamento attuale che mostra tutte le carte sotto la pagina.
 
-The final experience should:
+La selezione deve avvenire esclusivamente tramite il Modal.
 
-- Load significantly faster.
-- Render dramatically fewer components.
-- Avoid loading all tarot images initially.
-- Reduce bundle size.
-- Feel like browsing a real tarot deck.
-- Provide a modern, immersive, magical tarot selection experience.
-- Maintain full compatibility with the existing tarot reading and session workflow.
+---
+
+# DELIVERABLE
+
+Implementare:
+
+✅ Modal fullscreen
+
+✅ Embla Carousel
+
+✅ Framer Motion
+
+✅ Ricerca
+
+✅ Selezione carta
+
+✅ Responsive
+
+✅ Accessibilità
+
+✅ TypeScript pulito
+
+✅ Componenti modulari
+
+Il risul
+
+tato finale deve sembrare un'applicazione moderna e premium, mantenendo perfettamente l'identità fantasy medievale del progetto.
+
+
+# BONUS (implementare se compatibile con il progetto)
+
+Se la struttura del progetto lo consente:
+
+- aggiungere un leggero effetto particellare (lucciole/polvere magica) nello sfondo del modal;
+- aggiungere un bagliore animato attorno alla carta selezionata;
+- aggiungere una lieve parallasse durante lo spostamento del mouse;
+- aggiungere un'animazione di "ventaglio" all'apertura del mazzo;
+- mantenere il bundle leggero evitando dipendenze non necessarie;
+- utilizzare CSS Modules, Tailwind o lo styling già presente nel progetto senza introdurre un nuovo framework CSS.
