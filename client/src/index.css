@@ -147,6 +147,14 @@ body.medieval::before { content: ''; position: fixed; inset: 0; background: line
   }
 }
 
+/* Fan-slide wrapper for perspective transforms */
+.fan-slide {
+  width: 100%;
+  display: block;
+  transform-style: preserve-3d;
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
 /* Tarot Card Preview & Flip */
 .tarot-card-scene {
   width: 200px;
