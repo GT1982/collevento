@@ -55,32 +55,34 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
 
   function computeStyle(i:number){
     const diff = i - selectedIndex
-    const clamp = Math.max(-4, Math.min(4, diff))
+    const clamp = Math.max(-6, Math.min(6, diff))
     const abs = Math.abs(clamp)
-    const tx = clamp * 90
-    const rotate = clamp * -8
-    const scale = diff === 0 ? 1.12 : Math.max(0.7, 1 - abs * 0.06)
+    const angle = clamp * 8 // degrees per step
+    const tx = clamp * 80
+    const ty = -Math.abs(clamp) * 18
+    const rotateY = clamp * -8
+    const scale = clamp === 0 ? 1.16 : Math.max(0.7, 1 - abs * 0.06)
     const z = 100 - abs
-    const opacity = abs > 5 ? 0 : 1 - Math.min(0.6, abs * 0.12)
+    const opacity = abs > 6 ? 0 : 1 - Math.min(0.6, abs * 0.12)
     return {
-      transform: `translateX(${tx}px) rotateY(${rotate}deg) scale(${scale})`,
+      transform: `translateX(${tx}px) translateY(${ty}px) rotate(${angle}deg) rotateY(${rotateY}deg) scale(${scale})`,
       zIndex: z,
-      transition: 'transform 300ms ease, opacity 300ms ease',
+      transition: 'transform 300ms cubic-bezier(.2,.8,.2,1), opacity 300ms ease',
       opacity,
       transformOrigin: 'center bottom' as const,
-      pointerEvents: diff === 0 ? 'auto' as const : 'auto' as const
+      pointerEvents: 'auto' as const
     }
   }
 
   return (
     <div className="embla">
-      <div className="embla__viewport" ref={emblaRef}>
+      <div className="embla__viewport" ref={emblaRef} tabIndex={0} aria-label="Tarot carousel viewport">
         <div className="embla__container">
           {cards.map((card, idx) => (
             <div className="embla__slide" key={card}>
               <div className="fan-slide" style={computeStyle(idx)}>
                 {Math.abs(idx - selectedIndex) <= 3 ? (
-                  <Suspense fallback={<div className="tarot-placeholder" />]}>
+                  <Suspense fallback={null}>
                     <TarotCardPreview filename={card} deckType={deckType} onSelect={onSelect} forceLoad />
                   </Suspense>
                 ) : (
@@ -94,3 +96,4 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
     </div>
   )
 }
+
