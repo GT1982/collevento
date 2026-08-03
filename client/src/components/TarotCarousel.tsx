@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, Suspense } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
-import React, { Suspense } from 'react'
 const TarotCardPreview = React.lazy(() => import('./TarotCardPreview'))
 
 interface TarotCarouselProps {
@@ -80,7 +79,13 @@ export default function TarotCarousel({ cards, deckType, onSelect }: TarotCarous
           {cards.map((card, idx) => (
             <div className="embla__slide" key={card}>
               <div className="fan-slide" style={computeStyle(idx)}>
-                <TarotCardPreview filename={card} deckType={deckType} onSelect={onSelect} />
+                {Math.abs(idx - selectedIndex) <= 3 ? (
+                  <Suspense fallback={<div className="tarot-placeholder" />]}>
+                    <TarotCardPreview filename={card} deckType={deckType} onSelect={onSelect} forceLoad />
+                  </Suspense>
+                ) : (
+                  <div className="tarot-placeholder" aria-hidden="true" />
+                )}
               </div>
             </div>
           ))}
