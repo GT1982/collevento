@@ -2,7 +2,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import getRedis from '../_redis';
 import { publishSessionUpdate } from '../_realtime';
 
-const REDIS_PREFIX = 'redis-sky-anchor:';
+const REDIS_PREFIX = 'redis-castelvento:';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const id = req.query.id as string;

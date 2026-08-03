@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import getRedis from '../_redis';
 
-const REDIS_PREFIX = 'redis-sky-anchor:'; // namespace for this app's keys
+const REDIS_PREFIX = 'redis-castelvento:'; // namespace for this app's keys
 
 async function createSession(){
   // simple unique id generation; could also use an INCR key in Redis if desired
