@@ -27,7 +27,7 @@ export default function Landing(){
     <div style={{width:'100%', display:'flex', justifyContent:'flex-end'}}>
       <div className="app" style={{marginLeft: 'auto', marginRight: 24, width: '651px'}}>
         <div className="header">
-          <h1>ColleVento — Benvenuto viandante</h1>
+        <h1>Castel Vento — Benvenuto viandante</h1>
         </div>
         <p>Genera una nuova sessione o entra con un ID esistente.</p>
 
