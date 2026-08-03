@@ -104,8 +104,6 @@ export default function Session({ sessionId }: { sessionId: string }){
 
       <div style={{display:'flex', gap:12, marginTop:12}}>
         <button className="button" onClick={()=>{ const el = document.querySelector('.app'); if(el) (el as HTMLElement).scrollIntoView({behavior:'smooth', block:'start'}); }}>Contesto della Stesura</button>
-        <button className="button" onClick={()=>{ const el = document.getElementById('select-majors'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }}>Sezione Arcani Maggiori</button>
-        <button className="button" onClick={()=>{ const el = document.getElementById('select-minors'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }}>Sezione Arcani Minori</button>
 
         <button className="button" onClick={()=>{ const el = document.getElementById('area-stesura-majors'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }}>Stesura Arcani Maggiori</button>
         <button className="button" onClick={()=>{ const el = document.getElementById('area-stesura-minors'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }}>Stesura Arcani Minori</button>
